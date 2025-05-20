@@ -25,7 +25,6 @@ class booksPipeline:
 
         rating_val = item.get('rating', '')
         if rating_val:
-            # Extract the word after "star-rating "
             rating_word = rating_val.replace('star-rating', '').strip()
             rating_map = {
                 'One': 1,

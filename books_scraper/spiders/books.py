@@ -1,5 +1,7 @@
 import scrapy
 from books_scraper.items import BookScraperItem
+from scrapy.exceptions import CloseSpider
+from urllib.parse import urljoin
 
 
 class BooksSpider(scrapy.Spider):
@@ -15,3 +17,12 @@ class BooksSpider(scrapy.Spider):
             item['rating'] = book.css('p.star-rating::attr(class)').get()
             
             yield item
+
+        try:
+            next_page = response.css('li.next a::attr(href)').get()
+            if next_page:
+                next_page_url = urljoin(response.url, next_page)
+                yield scrapy.Request(next_page_url, callback=self.parse)
+        except Exception as e:
+            self.logger.error(f"Pagination error: {e}")
+            raise CloseSpider('Pagination failed')
